@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crypto Money Management Calculator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 420px;
+      margin: 40px auto;
+      padding: 25px;
+      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 25px;
+      text-shadow: 1px 1px 1px #ccc;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    input[type="number"]:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0,123,255,0.3);
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.4s ease;
+      box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+    }
+
+    button:hover {
+      background: linear-gradient(45deg, #0056b3, #003f7f);
+    }
+
+    .result {
+      margin-top: 30px;
+      background: #e0f0ff;
+      padding: 18px;
+      border-left: 6px solid #007bff;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #333;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    .result.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .error {
+      color: red;
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .result i {
+      color: #007bff;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h2><i class="fa-solid fa-coins"></i> Crypto Money Manager</h2>
+
+<label for="balance">💰 Account Balance ($):</label>
+<input type="number" id="balance" placeholder="Enter your account balance" />
+
+<label for="riskPercent">⚠️ Risk per Trade (%):</label>
+<input type="number" id="riskPercent" placeholder="Enter risk percentage (e.g. 2)" />
+
+<label for="entryPrice">📈 Entry Price ($):</label>
+<input type="number" id="entryPrice" placeholder="Enter entry price" />
+
+<label for="stopLossPrice">🛑 Stop-Loss Price ($):</label>
+<input type="number" id="stopLossPrice" placeholder="Enter stop-loss price" />
+
+<button onclick="calculatePosition()">🚀 Calculate Position</button>
+
+<div class="error" id="error"></div>
+
+<div class="result" id="result"></div>
+
+<script>
+  function calculatePosition() {
+    const balance = parseFloat(document.getElementById('balance').value);
+    const riskPercent = parseFloat(document.getElementById('riskPercent').value);
+    const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+    const stopLossPrice = parseFloat(document.getElementById('stopLossPrice').value);
+    const errorDiv = document.getElementById('error');
+    const resultDiv = document.getElementById('result');
+
+    errorDiv.textContent = '';
+    resultDiv.classList.remove('visible');
+    resultDiv.innerHTML = '';
+
+    if (isNaN(balance) || balance <= 0) {
+      errorDiv.textContent = 'Please enter a valid Account Balance.';
+      return;
+    }
+    if (isNaN(riskPercent) || riskPercent <= 0 || riskPercent > 100) {
+      errorDiv.textContent = 'Please enter a valid Risk percentage (0-100).';
+      return;
+    }
+    if (isNaN(entryPrice) || entryPrice <= 0) {
+      errorDiv.textContent = 'Please enter a valid Entry Price.';
+      return;
+    }
+    if (isNaN(stopLossPrice) || stopLossPrice <= 0) {
+      errorDiv.textContent = 'Please enter a valid Stop-Loss Price.';
+      return;
+    }
+    if (entryPrice === stopLossPrice) {
+      errorDiv.textContent = 'Entry Price and Stop-Loss Price cannot be the same.';
+      return;
+    }
+
+    const riskAmount = (balance * riskPercent) / 100;
+    const riskPerUnit = Math.abs(entryPrice - stopLossPrice);
+    const positionSize = riskAmount / riskPerUnit;
+
+    resultDiv.innerHTML = `
+      <i class="fa-solid fa-calculator"></i> <strong>Results:</strong><br/>
+      <i class="fa-solid fa-dollar-sign"></i> Risk Amount: <strong>$${riskAmount.toFixed(2)}</strong><br/>
+      <i class="fa-solid fa-chart-line"></i> Risk per Unit: <strong>$${riskPerUnit.toFixed(2)}</strong><br/>
+      <i class="fa-solid fa-cubes-stacked"></i> Max Position Size: <strong>${positionSize.toFixed(4)} units</strong>
+    `;
+    resultDiv.classList.add('visible');
+  }
+</script>
+
+</body>
+</html>
+
